@@ -47,6 +47,14 @@ LABEL maintainer="OpenCloud GmbH <devops@opencloud.eu>" \
         org.opencontainers.image.documentation="https://github.com/opencloud-eu/opencloud" \
         org.opencontainers.image.source="https://github.com/realtech2012/opencloud"
 
+ARG REVISION=""
+LABEL org.opencontainers.image.revision="$REVISION"
+
+EXPOSE 9200 5200 9174
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl -k -f https://127.0.0.1:9200/ || exit 1
+
 ENTRYPOINT ["/usr/bin/opencloud"]
 CMD ["server"]
 
