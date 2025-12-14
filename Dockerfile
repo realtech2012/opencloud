@@ -18,8 +18,9 @@ FROM owncloudci/nodejs:18 AS generate
 
 COPY ./ /opencloud/
 
-# Run generation from repo root so module `services/...` paths resolve correctly.
-WORKDIR /opencloud
+WORKDIR /opencloud/opencloud
+# Run the standard generation step, but fall back to running pnpm for idp
+# if assets are still missing (keeps original behaviour, minimal change).
 RUN make node-generate-prod || true && \
         if [ ! -d services/idp/assets ] || [ ! -s services/idp/assets/identifier/index.html ]; then \
                 cd services/idp && pnpm install --no-frozen-lockfile && pnpm build; \
