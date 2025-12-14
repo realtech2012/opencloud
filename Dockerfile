@@ -19,12 +19,7 @@ FROM owncloudci/nodejs:18 AS generate
 COPY ./ /opencloud/
 
 WORKDIR /opencloud/opencloud
-# Run the standard generation step, but fall back to running pnpm for idp
-# if assets are still missing (keeps original behaviour, minimal change).
-RUN make node-generate-prod || true && \
-        if [ ! -d services/idp/assets ] || [ ! -s services/idp/assets/identifier/index.html ]; then \
-                cd services/idp && pnpm install --no-frozen-lockfile && pnpm build; \
-        fi
+RUN make node-generate-prod
 
 FROM golang:1.24-alpine AS build
 RUN apk add bash make git curl gcc musl-dev libc-dev binutils-gold inotify-tools vips-dev
@@ -46,7 +41,7 @@ LABEL maintainer="OpenCloud GmbH <devops@opencloud.eu>" \
         org.opencontainers.image.description="OpenCloud is a modern file-sync and share platform" \
         org.opencontainers.image.licenses="Apache-2.0" \
         org.opencontainers.image.documentation="https://github.com/opencloud-eu/opencloud" \
-        org.opencontainers.image.source="https://github.com/realtech2012/opencloud"
+        org.opencontainers.image.source="https://github.com/opencloud-eu/opencloud"
 
 ENTRYPOINT ["/usr/bin/opencloud"]
 CMD ["server"]
